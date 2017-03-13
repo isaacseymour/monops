@@ -6,6 +6,8 @@ import Html.Attributes exposing (..)
 import Html.Events exposing (..)
 import GameView
 import Cards
+import Random.List
+import Random
 
 
 initGame : Game
@@ -16,6 +18,12 @@ initGame =
 init : ( Model, Cmd Msg )
 init =
     ( { game = initGame, pendingPlayerName = "" }, Cmd.none )
+
+
+shuffleDeck : List Card -> Cmd Msg
+shuffleDeck cards =
+    Random.List.shuffle cards
+        |> Random.generate ShuffledDeck
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -37,8 +45,25 @@ update msg model =
         PlayerInputChange name ->
             ( { model | pendingPlayerName = name }, Cmd.none )
 
+        ShuffledDeck newCards ->
+            let
+                game =
+                    model.game
+
+                newGame =
+                    { game | drawPile = Just newCards }
+            in
+                ( { model | game = newGame }, Cmd.none )
+
         StartGame ->
-            ( { model | game = startGame model.game }, Cmd.none )
+            let
+                newGame =
+                    startGame model.game
+
+                drawPile =
+                    newGame.drawPile |> Maybe.withDefault []
+            in
+                ( { model | game = newGame }, shuffleDeck drawPile )
 
 
 startGame : Game -> Game

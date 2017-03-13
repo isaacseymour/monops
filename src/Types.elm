@@ -9,6 +9,7 @@ type Msg
     = AddPlayer
     | PlayerInputChange String
     | StartGame
+    | ShuffledDeck (List Card)
 
 
 type Colour
