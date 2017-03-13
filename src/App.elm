@@ -68,7 +68,25 @@ update msg model =
 
 startGame : Game -> Game
 startGame game =
-    { game | drawPile = Just Cards.allCards }
+    let
+        firstPlayer =
+            List.head game.players |> Maybe.withDefault (Player "" [] [] [] Nothing)
+
+        withGo =
+            { firstPlayer | go = Just <| Go 3 }
+
+        allPlayers =
+            List.indexedMap
+                (\i player ->
+                    (if i == 0 then
+                        { player | go = Just (Go 3) }
+                     else
+                        player
+                    )
+                )
+                game.players
+    in
+        { game | drawPile = Just Cards.allCards, players = allPlayers }
 
 
 addPlayer : Model -> Model
