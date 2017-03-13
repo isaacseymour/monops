@@ -5,6 +5,12 @@ type alias Money =
     Int
 
 
+type Msg
+    = AddPlayer
+    | PlayerInputChange String
+    | StartGame
+
+
 type Colour
     = Stations
     | Utilities
@@ -22,15 +28,21 @@ type alias Set =
     { colour : Colour, rents : List Money }
 
 
+type alias TwoPropertyData =
+    { activeSet : Maybe Set
+    , sets : ( Set, Set )
+    }
+
+
 type Card
     = Cash Money
-    | Property Set Money
-    | TwoProperty { activeSet : Maybe Set, sets : ( Set, Set ) } Money
+    | Property String Set Money
+    | TwoProperty TwoPropertyData Money
     | WildProperty (Maybe Set)
     | DealBreaker
     | Birthday
-    | Rent Set Set Money
-    | MultiRent Money
+    | Rent Set Set
+    | MultiRent
     | DoubleRent
     | JustSayNo
     | DebtCollector

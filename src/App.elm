@@ -4,6 +4,8 @@ import Types exposing (..)
 import Html exposing (..)
 import Html.Attributes exposing (..)
 import Html.Events exposing (..)
+import GameView
+import Cards
 
 
 initGame : Game
@@ -16,17 +18,21 @@ init =
     ( { game = initGame, pendingPlayerName = "" }, Cmd.none )
 
 
-type Msg
-    = AddPlayer
-    | PlayerInputChange String
-    | StartGame
-
-
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         AddPlayer ->
-            ( addPlayer model, Cmd.none )
+            let
+                newModel =
+                    addPlayer model
+
+                hasMaxPlayers =
+                    List.length newModel.game.players == 5
+            in
+                if hasMaxPlayers then
+                    update StartGame newModel
+                else
+                    ( newModel, Cmd.none )
 
         PlayerInputChange name ->
             ( { model | pendingPlayerName = name }, Cmd.none )
@@ -37,7 +43,7 @@ update msg model =
 
 startGame : Game -> Game
 startGame game =
-    { game | drawPile = Just [ Cash 5 ] }
+    { game | drawPile = Just Cards.allCards }
 
 
 addPlayer : Model -> Model
@@ -60,20 +66,44 @@ addPlayer model =
         { model | game = newGame, pendingPlayerName = "" }
 
 
+addPlayersView : Model -> Html Msg
+addPlayersView model =
+    case model.game.drawPile of
+        Just _ ->
+            text ""
+
+        Nothing ->
+            div []
+                [ Html.form [ onSubmit AddPlayer ]
+                    [ input [ type_ "text", onInput PlayerInputChange, value model.pendingPlayerName ] []
+                    , button [ type_ "submit" ] [ text "Add Player" ]
+                    ]
+                , button [ onClick StartGame, disabled (List.length model.game.players < 2) ] [ text "Start the game" ]
+                ]
+
+
+gameView : Game -> Html Msg
+gameView game =
+    case game.drawPile of
+        Nothing ->
+            text "The game has not started"
+
+        Just _ ->
+            GameView.viewActiveGame game
+
+
 view : Model -> Html Msg
 view model =
     div []
-        [ Html.form [ onSubmit AddPlayer ]
-            [ input [ type_ "text", onInput PlayerInputChange, value model.pendingPlayerName ] []
-            , button [ type_ "submit" ] [ text "Add Player" ]
-            ]
-        , div [] (List.map showPlayer model.game.players)
+        [ addPlayersView model
+        , ul [ class "players-list" ] (List.map showPlayer model.game.players)
+        , gameView model.game
         ]
 
 
 showPlayer : Player -> Html Msg
 showPlayer player =
-    p [] [ text player.name ]
+    li [] [ text player.name ]
 
 
 subscriptions : Model -> Sub Msg
