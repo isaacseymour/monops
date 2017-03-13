@@ -1,35 +1,79 @@
 module App exposing (..)
 
-import Html exposing (Html, text, div, img)
-import Html.Attributes exposing (src)
+import Types exposing (..)
+import Html exposing (..)
+import Html.Attributes exposing (..)
+import Html.Events exposing (..)
 
 
-type alias Model =
-    { message : String
-    , logo : String
-    }
+initGame : Game
+initGame =
+    { players = [], drawPile = Nothing, discardPile = [] }
 
 
-init : String -> ( Model, Cmd Msg )
-init path =
-    ( { message = "Your Elm App is working!", logo = path }, Cmd.none )
+init : ( Model, Cmd Msg )
+init =
+    ( { game = initGame, pendingPlayerName = "" }, Cmd.none )
 
 
 type Msg
-    = NoOp
+    = AddPlayer
+    | PlayerInputChange String
+    | StartGame
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
-    ( model, Cmd.none )
+    case msg of
+        AddPlayer ->
+            ( addPlayer model, Cmd.none )
+
+        PlayerInputChange name ->
+            ( { model | pendingPlayerName = name }, Cmd.none )
+
+        StartGame ->
+            ( { model | game = startGame model.game }, Cmd.none )
+
+
+startGame : Game -> Game
+startGame game =
+    { game | drawPile = Just [ Cash 5 ] }
+
+
+addPlayer : Model -> Model
+addPlayer model =
+    let
+        game =
+            model.game
+
+        player =
+            { name = model.pendingPlayerName
+            , hand = []
+            , propertySets = []
+            , money = []
+            , go = Nothing
+            }
+
+        newGame =
+            { game | players = player :: game.players }
+    in
+        { model | game = newGame, pendingPlayerName = "" }
 
 
 view : Model -> Html Msg
 view model =
     div []
-        [ img [ src model.logo ] []
-        , div [] [ text model.message ]
+        [ Html.form [ onSubmit AddPlayer ]
+            [ input [ type_ "text", onInput PlayerInputChange, value model.pendingPlayerName ] []
+            , button [ type_ "submit" ] [ text "Add Player" ]
+            ]
+        , div [] (List.map showPlayer model.game.players)
         ]
+
+
+showPlayer : Player -> Html Msg
+showPlayer player =
+    p [] [ text player.name ]
 
 
 subscriptions : Model -> Sub Msg
