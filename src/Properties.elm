@@ -85,6 +85,7 @@ pinks =
 wildcards : List Card
 wildcards =
     [ ( 1, ( Sets.stations, Sets.utilities ), 4 )
+    , ( 1, ( Sets.stations, Sets.lightBlue ), 4 )
     , ( 2, ( Sets.yellow, Sets.red ), 3 )
     , ( 1, ( Sets.brown, Sets.lightBlue ), 1 )
     , ( 2, ( Sets.pink, Sets.orange ), 2 )

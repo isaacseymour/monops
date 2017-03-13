@@ -23,7 +23,7 @@ allCards =
         , List.repeat 3 ForceDeal
         , List.repeat 2 DealBreaker
         , Properties.all
-        , rentCards
+        , rentCards ++ (List.repeat 3 MultiRent)
         ]
 
 
