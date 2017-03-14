@@ -57,34 +57,31 @@ update msg model =
 
         StartGame ->
             let
-                newGame =
-                    startGame model.game
+                game =
+                    model.game
 
-                drawPile =
-                    newGame.drawPile |> Maybe.withDefault []
+                newGame =
+                    { game | drawPile = Just Cards.allCards }
+
+                finalGame =
+                    startGame newGame
             in
-                ( { model | game = newGame }, shuffleDeck drawPile )
+                ( { model | game = finalGame }, shuffleDeck (finalGame.drawPile |> Maybe.withDefault []) )
 
 
 startGame : Game -> Game
 startGame game =
     let
-        firstPlayer =
-            List.head game.players |> Maybe.withDefault (Player "" [] [] [] Nothing)
-
-        withGo =
-            { firstPlayer | go = Just <| Go 3 }
-
         allPlayers =
-            List.indexedMap
-                (\i player ->
-                    (if i == 0 then
-                        { player | go = Just (Go 3) }
-                     else
-                        player
+            game.players
+                |> List.indexedMap
+                    (\i player ->
+                        (if i == 0 then
+                            { player | go = Just (Go 3) }
+                         else
+                            player
+                        )
                     )
-                )
-                game.players
     in
         { game | drawPile = Just Cards.allCards, players = allPlayers }
 
