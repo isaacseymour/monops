@@ -17,29 +17,28 @@ setUpFirstGo players =
             )
 
 
-givePlayersStartingHand : List Card -> List Player -> List Player
-givePlayersStartingHand cards players =
+giveCardsToPlayer : List Card -> Player -> ( List Card, Player )
+giveCardsToPlayer cards player =
     let
-        groupedCards =
-            List.Extra.greedyGroupsOf 5 cards
+        ( playerCards, drawCards ) =
+            List.Extra.splitAt 5 cards
     in
+        ( drawCards, { player | hand = playerCards } )
+
+
+giveCardsToPlayers : List Card -> List Player -> ( List Card, List Player )
+giveCardsToPlayers cards players =
+    List.foldl
+        (\player ( latestCards, players ) ->
+            (let
+                ( newCards, newPlayer ) =
+                    giveCardsToPlayer latestCards player
+             in
+                ( newCards, List.append players [ newPlayer ] )
+            )
+        )
+        ( cards, [] )
         players
-            |> List.indexedMap
-                (\i player ->
-                    ({ player | hand = (List.Extra.getAt i groupedCards) |> Maybe.withDefault [] })
-                )
-
-
-dropCardsFromDrawPile : Game -> Game
-dropCardsFromDrawPile game =
-    let
-        cardsToDrop =
-            List.length game.players * 5
-
-        newDrawPile =
-            Maybe.map (List.drop cardsToDrop) game.drawPile
-    in
-        { game | drawPile = newDrawPile }
 
 
 startGame : Game -> Game
@@ -51,10 +50,7 @@ startGame game =
         cards =
             game.drawPile |> Maybe.withDefault []
 
-        playersWithHand =
-            givePlayersStartingHand cards allPlayers
-
-        newGame =
-            { game | players = playersWithHand }
+        ( finalDrawPile, finalPlayers ) =
+            giveCardsToPlayers cards allPlayers
     in
-        dropCardsFromDrawPile newGame
+        { game | players = finalPlayers, drawPile = Just finalDrawPile }
