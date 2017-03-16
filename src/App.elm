@@ -8,6 +8,7 @@ import GameView
 import Cards
 import Random.List
 import Random
+import Game
 
 
 initGame : Game
@@ -51,7 +52,7 @@ update msg model =
                     model.game
 
                 newGame =
-                    { game | drawPile = Just newCards }
+                    Game.startGame { game | drawPile = Just newCards }
             in
                 ( { model | game = newGame }, Cmd.none )
 
@@ -62,28 +63,8 @@ update msg model =
 
                 newGame =
                     { game | drawPile = Just Cards.allCards }
-
-                finalGame =
-                    startGame newGame
             in
-                ( { model | game = finalGame }, shuffleDeck (finalGame.drawPile |> Maybe.withDefault []) )
-
-
-startGame : Game -> Game
-startGame game =
-    let
-        allPlayers =
-            game.players
-                |> List.indexedMap
-                    (\i player ->
-                        (if i == 0 then
-                            { player | go = Just (Go 3) }
-                         else
-                            player
-                        )
-                    )
-    in
-        { game | drawPile = Just Cards.allCards, players = allPlayers }
+                ( { model | game = newGame }, shuffleDeck (newGame.drawPile |> Maybe.withDefault []) )
 
 
 addPlayer : Model -> Model
