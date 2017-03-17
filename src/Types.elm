@@ -10,6 +10,7 @@ type Msg
     | PlayerInputChange String
     | StartGame
     | ShuffledDeck (List Card)
+    | DrawCards Player
 
 
 type Colour
@@ -64,7 +65,7 @@ type alias Player =
 
 
 type alias Go =
-    { cardsRemaining : Int }
+    { cardsRemaining : Int, hasDrawn : Bool }
 
 
 type alias Game =

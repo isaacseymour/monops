@@ -7,3 +7,49 @@ body {
 .players-list {
   width: 100px;
 }
+
+.draw-pile {
+  width: 80px;
+  height: 150px;
+  background: red;
+  color: white;
+  text-align: center;
+  padding: 10px 5px;
+  border: 1px solid #ccc;
+}
+
+.game-board {
+  margin: 0 auto;
+  padding: 20px;
+  width: 90%;
+  border: 1px solid #ccc;
+  min-height: 400px;
+}
+
+.players {
+  clear: both;
+  margin: 20px 0;
+  padding: 0;
+  overflow: auto;
+}
+
+.players li {
+  float: left;
+  width: 100px;
+  list-style: none;
+  background: #ccc;
+  margin-right: 20px;
+  text-align: center;
+  padding: 10px;
+}
+
+.players .inactive-player {
+  opacity: 0.5;
+}
+
+.current-go {
+  margin: 20px;
+  clear: both;
+  border-top: 1px solid #ccc;
+  padding: 20px 0;
+}

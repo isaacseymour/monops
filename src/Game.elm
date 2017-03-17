@@ -10,11 +10,16 @@ setUpFirstGo players =
         |> List.indexedMap
             (\i player ->
                 (if i == 0 then
-                    { player | go = Just (Go 3) }
+                    { player | go = Just (Go 3 False) }
                  else
                     player
                 )
             )
+
+
+drawCardsForPlayer : Player -> Game -> Game
+drawCardsForPlayer player game =
+    game
 
 
 giveCardsToPlayer : List Card -> Player -> ( List Card, Player )

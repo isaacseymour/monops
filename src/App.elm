@@ -21,6 +21,24 @@ init =
     ( { game = initGame, pendingPlayerName = "" }, Cmd.none )
 
 
+initGameWithTwoPlayers : ( Model, Cmd Msg )
+initGameWithTwoPlayers =
+    let
+        jack =
+            Player "Jack" [] [] [] Nothing
+
+        isaac =
+            Player "Isaac" [] [] [] Nothing
+
+        game =
+            { players = [ jack, isaac ]
+            , drawPile = Just Cards.allCards
+            , discardPile = []
+            }
+    in
+        ( Model game "", shuffleDeck Cards.allCards )
+
+
 shuffleDeck : List Card -> Cmd Msg
 shuffleDeck cards =
     Random.List.shuffle cards
@@ -55,6 +73,9 @@ update msg model =
                     Game.startGame { game | drawPile = Just newCards }
             in
                 ( { model | game = newGame }, Cmd.none )
+
+        DrawCards player ->
+            ( { model | game = Game.drawCardsForPlayer player model.game }, Cmd.none )
 
         StartGame ->
             let
